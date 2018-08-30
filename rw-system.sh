@@ -1,5 +1,7 @@
 #!/system/bin/sh
 
+/system/bin/vndk-detect
+
 set -e
 
 setprop sys.usb.ffs.aio_compat true
