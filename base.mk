@@ -48,17 +48,8 @@ PRODUCT_COPY_FILES += \
 # NFC:
 #   Provide default libnfc-nci.conf file for devices that does not have one in
 #   vendor/etc
-#PRODUCT_COPY_FILES += \
-#	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
-
 PRODUCT_COPY_FILES += \
-	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf \
-	device/phh/treble/nfc/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
-	device/phh/treble/nfc/libnfc-nxp.conf:system/etc/libnfc-nxp.conf \
-	device/phh/treble/nfc/permissions/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
-	device/phh/treble/nfc/permissions/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
-	device/phh/treble/nfc/permissions/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
-	device/phh/treble/nfc/permissions/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml
+	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
 
 # LineageOS build may need this to make NFC work
 PRODUCT_PACKAGES += \
