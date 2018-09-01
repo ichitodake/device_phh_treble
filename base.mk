@@ -30,6 +30,10 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 	persist.sys.usb.config=adb
 	
+#Add OpenCamera prebuild package
+$(shell rm -rf packages/apps/Camera2)
+#$(shell (mkdir -p $(PRODUCT_OUT)/system/priv-app/OpenCamera))
+#$(shell (cp device/phh/treble/OpenCamera.apk $(PRODUCT_OUT)/system/priv-app/OpenCamera))
 
 #VNDK config files
 PRODUCT_COPY_FILES += \
@@ -44,13 +48,23 @@ PRODUCT_COPY_FILES += \
 # NFC:
 #   Provide default libnfc-nci.conf file for devices that does not have one in
 #   vendor/etc
+#PRODUCT_COPY_FILES += \
+#	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
+
 PRODUCT_COPY_FILES += \
-	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
+	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf \
+	device/phh/treble/nfc/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
+	device/phh/treble/nfc/libnfc-nxp.conf:system/etc/libnfc-nxp.conf \
+	device/phh/treble/nfc/permissions/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
+	device/phh/treble/nfc/permissions/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
+	device/phh/treble/nfc/permissions/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
+	device/phh/treble/nfc/permissions/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml
 
 # LineageOS build may need this to make NFC work
 PRODUCT_PACKAGES += \
-        NfcNci  
-
+        NfcNci \
+        OpenCamera
+        
 PRODUCT_COPY_FILES += \
 	device/phh/treble/rw-system.sh:system/bin/rw-system.sh \
 	device/phh/treble/fixSPL/getSPL.arm:system/bin/getSPL
