@@ -48,13 +48,16 @@ PRODUCT_COPY_FILES += \
 # NFC:
 #   Provide default libnfc-nci.conf file for devices that does not have one in
 #   vendor/etc
-PRODUCT_COPY_FILES += \
+#PRODUCT_COPY_FILES += \
 	device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
 
 # LineageOS build may need this to make NFC work
 PRODUCT_PACKAGES += \
+        OpenCamera \
         NfcNci \
-        OpenCamera
+        GoogleServicesFramework \
+        Phonesky \
+        PrebuiltGmsCorePi
         
 PRODUCT_COPY_FILES += \
 	device/phh/treble/rw-system.sh:system/bin/rw-system.sh \
