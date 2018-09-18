@@ -1,9 +1,8 @@
 #!/system/bin/sh
 
-/system/bin/vndk-detect
-
 set -e
 
+vndk="$(getprop persist.sys.vndk)"
 setprop sys.usb.ffs.aio_compat true
 
 fixSPL() {
@@ -43,6 +42,37 @@ fixSPL() {
     fi
 }
 
+changeKeylayout() {
+    cp -a /system/usr/keylayout /mnt/phh/keylayout
+    changed=false
+
+    if getprop ro.vendor.build.fingerprint | \
+        grep -qE -e ".*(crown|star)[q2]*lte.*"  -e ".*(SC-0[23]K|SCV3[89]).*";then
+        changed=true
+
+        cp /system/phh/samsung-gpio_keys.kl /mnt/phh/keylayout/gpio_keys.kl
+        cp /system/phh/samsung-sec_touchscreen.kl /mnt/phh/keylayout/sec_touchscreen.kl
+        chmod 0644 /mnt/phh/keylayout/gpio_keys.kl /mnt/phh/keylayout/sec_touchscreen.kl
+    fi
+
+    if getprop ro.vendor.build.fingerprint |grep -iq -e xiaomi/polaris -e xiaomi/sirius -e xiaomi/dipper;then
+        cp /system/phh/empty /mnt/phh/keylayout/uinput-goodix.kl
+        chmod 0644 /mnt/phh/keylayout/uinput-goodix.kl
+        changed=true
+    fi
+
+    if [ "$(getprop ro.vendor.product.device)" == "OnePlus6" ];then
+        cp /system/phh/oneplus6-synaptics_s3320.kl /mnt/phh/keylayout/synaptics_s3320.kl
+        chmod 0644 /mnt/phh/keylayout/synaptics_s3320.kl
+        changed=true
+    fi
+
+    if [ "$changed" == true ];then
+        mount -o bind /mnt/phh/keylayout /system/usr/keylayout
+        restorecon -R /system/usr/keylayout
+    fi
+}
+
 if mount -o remount,rw /system;then
 	resize2fs $(grep ' /system ' /proc/mounts |cut -d ' ' -f 1) || true
 elif mount -o remount,rw /;then
@@ -53,9 +83,10 @@ mount -o remount,ro / || true
 
 mkdir -p /mnt/phh/
 mount -t tmpfs -o rw,nodev,relatime,mode=755,gid=0 none /mnt/phh || true
-set +e
+mkdir /mnt/phh/empty_dir
 fixSPL
-set -e
+
+changeKeylayout
 
 if grep vendor.huawei.hardware.biometrics.fingerprint /vendor/manifest.xml;then
     mount -o bind system/phh/huawei/fingerprint.kl /vendor/usr/keylayout/fingerprint.kl
@@ -91,8 +122,13 @@ if grep -qF 'mkdir /data/.fps 0770 system fingerp' vendor/etc/init/hw/init.mmi.r
     chown system:9015 /sys/devices/soc/soc:fpc_fpc1020/irq_cnt
 fi
 
-if getprop ro.vendor.build.fingerprint |grep -q Xiaomi/clover/clover;then
+if getprop ro.vendor.build.fingerprint |grep -q -e Xiaomi/clover/clover -e iaomi/wayne/wayne;then
     setprop persist.sys.qcom-brightness $(cat /sys/class/leds/lcd-backlight/max_brightness)
+fi
+
+if getprop ro.vendor.build.fingerprint |grep -q -e Xiaomi/beryllium/beryllium -e Xiaomi/sirius/sirius -e Xiaomi/dipper/dipper -e Xiaomi/ursa/ursa -e Xiaomi/polaris/polaris;then
+    mount -o bind /mnt/phh/empty_dir /vendor/lib64/soundfx
+    mount -o bind /mnt/phh/empty_dir /vendor/lib/soundfx
 fi
 
 for f in /vendor/lib/mtk-ril.so /vendor/lib64/mtk-ril.so;do
@@ -109,3 +145,20 @@ for f in /vendor/lib/mtk-ril.so /vendor/lib64/mtk-ril.so;do
 done
 
 mount -o bind /system/phh/empty /vendor/overlay/SysuiDarkTheme/SysuiDarkTheme.apk || true
+
+if grep -qF 'PowerVR Rogue GE8100' /vendor/lib/egl/GLESv1_CM_mtk.so;then
+	setprop debug.hwui.renderer opengl
+fi
+
+#If we have both Samsung and AOSP power hal, take Samsung's
+if [ -f /vendor/bin/hw/vendor.samsung.hardware.miscpower@1.0-service ];then
+	mount -o bind /system/phh/empty /vendor/bin/hw/android.hardware.power@1.0-service
+fi
+
+if [ "$vndk" == 27 -o "$vndk" == 26 ];then
+    mount -o bind /system/phh/libnfc-nci-oreo.conf /system/etc/libnfc-nci.conf
+fi
+
+if busybox_phh unzip -p /vendor/app/ims/ims.apk classes.dex |grep -qF -e Landroid/telephony/ims/feature/MmTelFeature -e Landroid/telephony/ims/feature/MMTelFeature;then
+    mount -o bind /system/phh/empty /vendor/app/ims/ims.apk
+fi
