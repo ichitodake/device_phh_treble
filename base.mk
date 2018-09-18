@@ -3,6 +3,11 @@
 PRODUCT_COPY_FILES := \
 	frameworks/native/data/etc/android.hardware.fingerprint.xml:system/etc/permissions/android.hardware.fingerprint.xml \
 	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml
+	
+# Permissions
+PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.consumerir.xml:system/etc/permissions/android.hardware.consumerir.xml \
+	frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml
 
 #Use a more decent APN config
 PRODUCT_COPY_FILES += \
@@ -54,11 +59,41 @@ PRODUCT_COPY_FILES += \
 # LineageOS build may need this to make NFC work
 PRODUCT_PACKAGES += \
         OpenCamera \
-        NfcNci \
         GoogleServicesFramework \
         Phonesky \
         PrebuiltGmsCorePi
-        
+
+# NFC
+#PRODUCT_PACKAGES += \
+    android.hardware.nfc@1.0-impl \
+    com.android.nfc_extras \
+    android.hardware.nfc@1.0-impl \
+    android.hardware.nfc@1.1-impl \
+    android.hardware.nfc@1.1-service \
+    nfc.hi3660 \
+    libnfc \
+    libnfc_jni \
+    Tag
+PRODUCT_PACKAGES += \
+    NfcNci \
+    libnfc-nci \
+    Tag \
+    com.android.nfc_extras
+
+PRODUCT_COPY_FILES += \
+    device/phh/treble/nfc/libnfc-nci.conf:system/etc/libnfc-nci.conf
+    #frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+    frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
+    frameworks/native/data/etc/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
+    frameworks/base/nfc-extras/com.android.nfc_extras.xml:system/etc/permissions/com.android.nfc_extras.xml \
+    device/phh/treble/nfc/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
+    device/phh/treble/nfc/libnfc-nxp.conf:system/etc/libnfc-nxp.conf
+    #device/phh/treble/nfc/nfcee_access.xml:system/etc/nfcee_access.xml \
+
+# Bootanimation
+PRODUCT_COPY_FILES += \
+    device/phh/treble/bootanimation.zip:system/media/bootanimation.zip
+    
 PRODUCT_COPY_FILES += \
 	device/phh/treble/rw-system.sh:system/bin/rw-system.sh \
 	device/phh/treble/fixSPL/getSPL.arm:system/bin/getSPL
